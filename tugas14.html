@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaulCLoud - Musik Aesthetic Anda</title>
+    <!-- Load Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Konfigurasi Tailwind untuk warna aesthetic/lucu -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'maul-pink': '#FFDADA', // Pink Muda Pastel
+                        'maul-purple': '#B388EB', // Ungu Pastel
+                        'maul-accent': '#88EBE3', // Biru Muda/Cyan Lucu
+                        'maul-dark': '#301934', // Ungu Gelap untuk teks
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Mengatur font default menjadi Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        /* Menggunakan scrollbar yang lebih halus dan sesuai tema */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+        body::-webkit-scrollbar-track {
+            background: #FFFAFA; /* Hampir putih */
+        }
+        body::-webkit-scrollbar-thumb {
+            background-color: #B388EB; /* Ungu Pastel */
+            border-radius: 10px;
+            border: 2px solid #FFFAFA;
+        }
+
+        /* Kelas untuk ikon kustom */
+        .icon-small {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Efek klik pada track card */
+        .track-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Efek untuk tombol putar/jeda */
+        .control-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* Style untuk elemen yang dapat diedit agar terlihat profesional */
+        [contenteditable="true"]:focus {
+            outline: 2px solid theme('colors.maul-accent');
+            box-shadow: 0 0 0 2px theme('colors.maul-purple');
+        }
+    </style>
+</head>
+<body class="bg-maul-pink text-maul-dark min-h-screen pb-20 font-sans">
+
+    <!-- Kontainer Utama, Mobile-First -->
+    <div id="app-container" class="max-w-screen-md mx-auto bg-white shadow-2xl min-h-screen">
+        
+        <!-- Header (Navigasi Atas) -->
+        <header class="sticky top-0 bg-maul-purple p-4 flex justify-between items-center z-20 shadow-lg rounded-b-xl">
+            <!-- Judul MaulCoud Dibuat Editable -->
+            <h1 id="app-title" contenteditable="true" class="text-2xl font-black text-white tracking-widest cursor-text outline-none focus:ring-2 focus:ring-maul-accent rounded p-1 -m-1">
+                MaulCLoud
+            </h1>
+            <!-- Ikon Profil / Home untuk Toggle View -->
+            <button id="header-toggle-btn" class="text-white hover:text-maul-accent transition control-btn" onclick="toggleView('profile')">
+                <!-- Ikon Default: Profil (Saat di Home View) -->
+                <svg id="profile-icon" class="icon-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <!-- Ikon Home (Saat di Profile View - Awalnya hidden) -->
+                <svg id="home-icon" class="icon-small hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </button>
+        </header>
+
+        <!-- Bagian Pencarian dan Navigasi Cepat - Terlihat di Home View saja -->
+        <div id="search-bar" class="p-4 bg-maul-pink/70 rounded-b-xl mb-4">
+            <div class="relative">
+                <input type="text" placeholder="Cari Lagu, Artis, atau Playlist..." 
+                       class="w-full p-3 pl-10 rounded-full border-2 border-maul-purple focus:ring-2 focus:ring-maul-accent focus:border-maul-accent transition placeholder-maul-dark/70 text-sm font-semibold shadow-inner">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-maul-purple">
+                    <!-- Ikon Cari (SVG) -->
+                    <svg class="icon-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </div>
+            </div>
+            
+            <!-- Tab Navigasi Cepat -->
+            <div class="flex justify-around mt-4 text-xs font-semibold">
+                <span class="py-2 px-3 rounded-full bg-maul-purple text-white shadow-md cursor-pointer transition control-btn">Trending</span>
+                <span class="py-2 px-3 rounded-full bg-white/80 text-maul-dark shadow-md cursor-pointer hover:bg-white transition control-btn">Baru Rilis</span>
+                <span class="py-2 px-3 rounded-full bg-white/80 text-maul-dark shadow-md cursor-pointer hover:bg-white transition control-btn">Playlist</span>
+            </div>
+        </div>
+
+        <!-- CONTAINER UNTUK VIEWS -->
+        <div id="content-views">
+
+            <!-- TAB 1: HOME/TRENDING (Tampilan Awal) -->
+            <div id="home-view" class="p-4 space-y-4">
+                <h2 class="text-xl font-extrabold text-maul-purple border-b-2 border-maul-accent pb-1 mb-4">
+                    🔥 Hot Trending MaulCLoud
+                </h2>
+
+                <!-- Daftar Track akan di-inject oleh JavaScript di sini -->
+                <div id="track-list" class="space-y-3">
+                    <!-- Data Track Mockup -->
+                </div>
+
+                <h2 class="text-xl font-extrabold text-maul-purple border-b-2 border-maul-accent pb-1 pt-4 mb-4">
+                    ✨ Rekomendasi Untuk Kamu
+                </h2>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Playlist Card 1 (Sekarang bisa diklik) -->
+                    <div class="bg-maul-accent/50 p-3 rounded-xl shadow-lg hover:shadow-xl transition cursor-pointer control-btn" onclick="viewPlaylist(1)">
+                        <img src="pfp.jpg" onerror="this.onerror=null;this.src='https://placehold.co/100x100/B388EB/FFFFFF?text=Lofi'" alt="Playlist Lofi" class="rounded-lg mb-2 w-full aspect-square object-cover">
+                        <p class="font-bold text-sm text-maul-dark">Musik Kalem</p>
+                        <p class="text-xs opacity-70">2 Tracks</p>
+                    </div>
+                    <!-- Playlist Card 2 (Sekarang bisa diklik) -->
+                    <div class="bg-maul-accent/50 p-3 rounded-xl shadow-lg hover:shadow-xl transition cursor-pointer control-btn" onclick="viewPlaylist(2)">
+                        <img src="icon.jpg" onerror="this.onerror=null;this.src='https://placehold.co/100x100/FFDADA/301934?text=Indie'" alt="Playlist Indie Pop" class="rounded-lg mb-2 w-full aspect-square object-cover">
+                        <p class="font-bold text-sm text-maul-dark"> chill</p>
+                        <p class="text-xs opacity-70">2 Tracks</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB 2: PROFILE/EDIT (Konten Editable - Awalnya hidden) -->
+            <div id="profile-view" class="p-4 space-y-6 hidden">
+                <h2 class="text-xl font-extrabold text-maul-purple border-b-2 border-maul-accent pb-1 mb-6">
+                    👤 Edit Profil Anda
+                </h2>
+
+                <!-- Pesan Feedback Setelah Menyimpan -->
+                <div id="save-message" class="hidden bg-maul-accent/80 text-maul-dark p-3 rounded-xl font-semibold text-sm transition duration-300">
+                    Pesan feedback di sini.
+                </div>
+
+                <!-- Kartu Profil Editable -->
+                <div class="bg-maul-purple/30 p-6 rounded-3xl shadow-xl">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <img src="taylor swift eras tour icon.jpg" alt="Foto Profil" class="w-16 h-16 rounded-full border-4 border-maul-purple shadow-md">
+                        <div>
+                            <p class="text-sm opacity-70">Taylor Swift:</p>
+                            <p id="profile-username" contenteditable="true" 
+                               class="text-2xl font-black text-maul-dark cursor-text outline-none focus:ring-1 focus:ring-maul-purple rounded p-1 -m-1">
+                                MaulCLoud Fan
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 mt-4">
+                        <p class="font-bold text-maul-dark">Bio :</p>
+                        <div id="profile-bio" contenteditable="true" 
+                             class="bg-white p-3 rounded-lg text-sm text-maul-dark cursor-text min-h-[50px] outline-none focus:ring-2 focus:ring-maul-purple border border-maul-purple/50">
+                            Musikku adalah teman terbaikku saat hujan. Suka lagu-lagu lofi dan beat yang lucu! 🎧✨
+                        </div>
+                    </div>
+
+                    <!-- Tombol Simpan -->
+                    <div class="mt-6 flex justify-center">
+                        <button onclick="saveProfile()" class="bg-maul-purple text-white px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-maul-dark transition control-btn">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-bold text-maul-dark pt-4 border-t border-maul-accent">Pengaturan Lainnya</h3>
+                <p class="text-sm opacity-80">.</p>
+            </div>
+            
+            <!-- TAB 3: PLAYLIST DETAIL (Awalnya hidden) -->
+            <div id="playlist-detail-view" class="p-4 space-y-6 hidden">
+                <button onclick="toggleView('home')" class="text-maul-purple font-semibold flex items-center mb-6 control-btn hover:text-maul-dark transition">
+                    <svg class="icon-small w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
+                    Kembali ke Beranda
+                </button>
+
+                <!-- Header Playlist Editable -->
+                <div class="bg-maul-purple/20 p-6 rounded-2xl shadow-lg">
+                    <img id="playlist-detail-art" src="https://placehold.co/120x120/B388EB/FFFFFF?text=PLAYLIST" alt="Playlist Art" class="w-24 h-24 rounded-xl object-cover mb-4 shadow-md">
+                    
+                    <p class="text-sm opacity-70">my Playlist:</p>
+                    <h2 id="playlist-detail-title" contenteditable="true" class="text-3xl font-black text-maul-dark cursor-text outline-none focus:ring-1 focus:ring-maul-purple rounded p-1 -m-1">
+                        Musik kalem
+                    </h2>
+                    
+                    <p id="playlist-detail-count" class="text-sm opacity-80 mt-2">2 Tracks</p>
+                    <p class="text-sm opacity-70 mt-4">Deskripsi:</p>
+                    <div id="playlist-detail-description" contenteditable="true" class="bg-white p-3 rounded-lg text-sm text-maul-dark cursor-text min-h-[40px] outline-none focus:ring-2 focus:ring-maul-purple border border-maul-purple/50">
+                        biar ga gampang emosi, dengerin ni lagu
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-extrabold text-maul-purple border-b-2 border-maul-accent pb-1 mb-4 pt-4">
+                    Daftar Musik
+                </h3>
+                
+                <!-- Tracks in Playlist -->
+                <div id="playlist-track-list" class="space-y-3">
+                    <!-- Track cards will be rendered here -->
+                </div>
+
+                <button onclick="savePlaylistDetails()" class="w-full bg-maul-accent text-maul-dark px-6 py-3 rounded-full font-bold shadow-lg hover:bg-maul-accent/80 transition control-btn mt-6">
+                    Simpan Perubahan Playlist
+                </button>
+            </div>
+
+
+        </div> <!-- END content-views -->
+        
+    </div>
+
+    <!-- Mini Player Bar (Sticky di Bawah) -->
+    <footer id="player-bar" class="fixed bottom-0 left-0 w-full md:left-1/2 md:-translate-x-1/2 md:max-w-screen-md bg-maul-purple text-white shadow-2xl hidden z-10" style="box-shadow: 0 -5px 15px rgba(0,0,0,0.2);">
+        <div class="flex items-center p-3">
+            
+            <!-- Album Art Mini -->
+            <img id="player-art" src="https://placehold.co/40x40/301934/FFFFFF?text=♪" alt="Art" class="w-10 h-10 rounded-lg mr-3 shadow-md">
+            
+            <!-- Detail Lagu -->
+            <div class="flex-grow min-w-0">
+                <p id="player-title" class="font-bold text-sm truncate">w2e</p>
+                <p id="player-artist" class="text-xs opacity-80 truncate">Taylor Swift</p>
+            </div>
+            
+            <!-- Kontrol Pemutar -->
+            <div class="flex items-center space-x-4 ml-4">
+                <!-- Tombol Sebelumnya -->
+                <button class="control-btn opacity-80 hover:opacity-100 transition">
+                    <svg class="icon-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
+                <!-- Tombol Putar/Jeda -->
+                <button id="play-pause-btn" class="control-btn p-2 bg-maul-accent rounded-full text-maul-dark shadow-xl hover:scale-105 transition">
+                    <!-- Ikon Putar (default) -->
+                    <svg id="play-icon" class="icon-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+                    <!-- Ikon Jeda (hidden by default) -->
+                    <svg id="pause-icon" class="icon-small hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <!-- Tombol Selanjutnya -->
+                <button class="control-btn opacity-80 hover:opacity-100 transition">
+                    <svg class="icon-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6 18l8.5-6L6 6v12zM16 6h2v12h-2z"/></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Progress Bar (Sederhana) -->
+        <div class="h-1 bg-maul-dark/30">
+            <div id="progress-bar" class="h-full bg-maul-accent w-1/4 rounded-r-full transition-all duration-500 ease-linear"></div>
+        </div>
+    </footer>
+
+    <script>
+        // Data Mockup untuk Daftar Lagu (Edit 'placeholderText' di sini!)
+        // TIPS: Ganti nilai 'placeholderText' dengan Emoji + Teks untuk Cover Art yang lebih menarik.
+        // Jika Anda ingin menggunakan GAMBAR SENDIRI, tambahkan properti 'coverArtUrl: "URL_GAMBAR_ANDA"'
+        let mockTracks = [
+            { id: 1, title: "Love", artist: "Wave to Earth", duration: "5:07", color: "B388EB", coverArtUrl: "love.jpg" },
+            { id: 2, title: "Bad", artist: "Wave to Earth", duration: "4:12", color: "FFDADA", coverArtUrl: "bad.jpg" }, 
+            { id: 3, title: "Season", artist: "W2E", duration: "4:50", color: "88EBE3", coverArtUrl: "wave to earth album cover.jpg" },
+    ]
+        
+        // Data Mockup untuk Daftar Playlist
+        const mockPlaylists = [
+            { 
+                id: 1, 
+                title: "Musik Kalem", 
+                tracks: [1, 2, 5], 
+                description: "Musik yang sangat tenang untuk belajar atau sekadar bersantai di sore hari. Jangan lupa kopi! ☕️📚",
+                image: "pfp.jpg"
+            },
+            { 
+                id: 2, 
+                title: "chill", 
+                tracks: [2, 3, 4], 
+                description: "Lagu-lagu yang bikin mood naik dan senyum sepanjang hari! Penuh warna dan keceriaan.☀️🎉",
+                image: "icon.jpg"
+            }
+        ];
+
+        // Elemen DOM utama
+        const trackList = document.getElementById('track-list');
+        const playerBar = document.getElementById('player-bar');
+        const playerTitle = document.getElementById('player-title');
+        const playerArtist = document.getElementById('player-artist');
+        const playerArt = document.getElementById('player-art');
+        const progressBar = document.getElementById('progress-bar');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const searchBar = document.getElementById('search-bar'); 
+
+        // Elemen DOM untuk Views & Modals
+        const homeView = document.getElementById('home-view');
+        const profileView = document.getElementById('profile-view');
+        const playlistDetailView = document.getElementById('playlist-detail-view');
+        const profileIcon = document.getElementById('profile-icon');
+        const homeIcon = document.getElementById('home-icon');
+        const saveMessage = document.getElementById('save-message');
+
+        let isPlaying = false; 
+        let currentView = 'home'; 
+        let currentPlaylistId = null; 
+
+        // Fungsi untuk membuat URL gambar (menggunakan gambar asli jika ada, fallback ke placeholder)
+        function getTrackImageUrl(track) {
+             // 1. Cek apakah ada URL gambar asli (custom)
+             if (track.coverArtUrl && track.coverArtUrl.length > 5) {
+                return track.coverArtUrl;
+             }
+
+             // 2. Fallback: Buat URL placeholder yang aesthetic
+             let textColor = 'FFFFFF'; // Default: White text (untuk latar gelap seperti Ungu)
+             
+             // Jika latar belakangnya terang (maul-pink atau maul-accent), gunakan teks gelap
+             if (track.color === 'FFDADA' || track.color === '88EBE3') {
+                 textColor = '000000';
+             }
+             
+             // Ganti spasi dengan '+' agar URL Placehold.co terbaca
+             const textToDisplay = track.placeholderText.replace(/\s/g, '+'); 
+             
+             return `https://placehold.co/100x100/${track.color}/${textColor}/png?text=${encodeURIComponent(textToDisplay)}`;
+        }
+
+
+        // Fungsi untuk membuat HTML card lagu
+        function createTrackCard(track, isPlaylistTrack = false) {
+            const bgColor = {
+                'B388EB': 'bg-maul-purple/20',
+                'FFDADA': 'bg-maul-pink/50',
+                '88EBE3': 'bg-maul-accent/50',
+                '301934': 'bg-gray-100',
+            }[track.color] || 'bg-white';
+            
+            const shadowClass = isPlaylistTrack ? 'shadow-sm' : 'shadow-md';
+            const imageUrl = getTrackImageUrl(track);
+
+            return `
+                <div class="track-card ${bgColor} p-3 flex items-center rounded-2xl ${shadowClass} cursor-pointer hover:shadow-lg transition duration-200" 
+                     data-id="${track.id}" onclick="playTrack(${track.id})">
+                    
+                    <!-- Album Art -->
+                    <img src="${imageUrl}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/${track.color}/FFFFFF?text=♪';" alt="Album Art ${track.title}" class="w-14 h-14 rounded-xl object-cover mr-3 shadow-lg">
+                    
+                    <!-- Detail -->
+                    <div class="flex-grow min-w-0">
+                        <p class="font-extrabold text-maul-dark truncate">${track.title}</p>
+                        <p class="text-xs opacity-70 truncate">${track.artist}</p>
+                    </div>
+
+                    <!-- Durasi & Opsi Tambahan/Hapus -->
+                    <div class="flex items-center ml-4">
+                        <span class="text-xs font-medium text-maul-dark/80">${track.duration}</span>
+                        ${isPlaylistTrack ? 
+                            // Opsi Hapus (Simulasi) di Playlist Detail
+                            `<button class="text-red-500 hover:text-red-700 transition control-btn text-xs ml-3" onclick="event.stopPropagation(); removeTrackFromPlaylist(${track.id})">Hapus</button>` :
+                            '' 
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        // Fungsi untuk merender daftar lagu di Home View
+        function renderTracks() {
+            trackList.innerHTML = mockTracks.map(track => createTrackCard(track, false)).join('');
+        }
+
+        // FUNGSI BANTUAN: Pengganti alert()
+        function showFeedbackMessage(message, isError = false) {
+            saveMessage.textContent = message;
+            saveMessage.classList.remove('hidden', 'bg-maul-accent/80', 'bg-red-300');
+            saveMessage.classList.add(isError ? 'bg-red-300' : 'bg-maul-accent/80');
+
+            setTimeout(() => {
+                saveMessage.classList.add('hidden');
+            }, 3000);
+        }
+
+        // FUNGSI untuk merender daftar lagu di Playlist Detail View
+        function renderPlaylistTracks(playlist) {
+            const playlistTrackList = document.getElementById('playlist-track-list');
+            const tracksInPlaylist = mockTracks.filter(track => playlist.tracks.includes(track.id));
+
+            if (tracksInPlaylist.length === 0) {
+                playlistTrackList.innerHTML = `<p class="text-center text-sm opacity-70 p-4 bg-white rounded-lg">Playlist ini masih kosong, ayo tambahkan musik!</p>`;
+            } else {
+                playlistTrackList.innerHTML = tracksInPlaylist.map(track => createTrackCard(track, true)).join('');
+            }
+            
+            document.getElementById('playlist-detail-count').textContent = `${tracksInPlaylist.length} Tracks`;
+        }
+
+        // FUNGSI: Melihat Detail Playlist
+        function viewPlaylist(playlistId) {
+            const playlist = mockPlaylists.find(p => p.id === playlistId);
+            if (!playlist) return;
+
+            currentPlaylistId = playlistId;
+
+            document.getElementById('playlist-detail-title').textContent = playlist.title;
+            document.getElementById('playlist-detail-description').textContent = playlist.description;
+            document.getElementById('playlist-detail-art').src = playlist.image;
+            document.getElementById('playlist-detail-art').alt = `Playlist Art ${playlist.title}`;
+
+            renderPlaylistTracks(playlist);
+
+            homeView.classList.add('hidden');
+            profileView.classList.add('hidden');
+            searchBar.classList.add('hidden');
+            playlistDetailView.classList.remove('hidden');
+
+            currentView = 'playlist';
+            playerBar.classList.add('hidden'); 
+        }
+
+        // FUNGSI: Simulasi Hapus Lagu dari Playlist
+        function removeTrackFromPlaylist(trackId) {
+            const playlist = mockPlaylists.find(p => p.id === currentPlaylistId);
+            if (playlist) {
+                playlist.tracks = playlist.tracks.filter(id => id !== trackId);
+                renderPlaylistTracks(playlist);
+                const track = mockTracks.find(t => t.id === trackId);
+                showFeedbackMessage(`"${track.title}" berhasil dihapus dari playlist.`);
+            }
+        }
+        
+        // FUNGSI: Simulasi Simpan Detail Playlist
+        function savePlaylistDetails() {
+            const title = document.getElementById('playlist-detail-title').textContent;
+            const description = document.getElementById('playlist-detail-description').textContent;
+            
+            const playlist = mockPlaylists.find(p => p.id === currentPlaylistId);
+            if (playlist) {
+                playlist.title = title;
+                playlist.description = description;
+            }
+
+            showFeedbackMessage('Detail Playlist berhasil disimpan! 🎉');
+        }
+
+        // Fungsi utama untuk "memutar" lagu (mengupdate UI player)
+        function playTrack(trackId) {
+            const track = mockTracks.find(t => t.id === trackId);
+            if (!track) return;
+
+            // 1. Update Detail Player Bar
+            playerTitle.textContent = track.title;
+            playerArtist.textContent = track.artist;
+            playerArt.src = getTrackImageUrl(track); // Menggunakan fungsi baru untuk gambar
+            playerArt.alt = `Art ${track.title}`;
+            
+            // 2. Tampilkan Player Bar
+            playerBar.classList.remove('hidden');
+
+            // 3. Atur status pemutaran menjadi Putar
+            isPlaying = true;
+            updatePlayPauseButton(true);
+
+            // 4. Reset dan Animasi Progress Bar (Simulasi)
+            progressBar.style.width = '0%';
+            setTimeout(() => {
+                progressBar.style.transitionDuration = '10s'; 
+                progressBar.style.width = '100%';
+            }, 100);
+        }
+
+        // Fungsi untuk mengupdate ikon Putar/Jeda
+        function updatePlayPauseButton(playing) {
+            if (playing) {
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+            } else {
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+            }
+        }
+
+        // FUNGSI: Mengubah Tampilan (Tab)
+        function toggleView(target) {
+            homeView.classList.add('hidden');
+            profileView.classList.add('hidden');
+            playlistDetailView.classList.add('hidden');
+            searchBar.classList.add('hidden'); 
+            playerBar.classList.add('hidden'); 
+            saveMessage.classList.add('hidden'); 
+
+            let finalTarget = target;
+            if (target === 'profile') {
+                if (currentView === 'home' || currentView === 'playlist') {
+                    finalTarget = 'profile';
+                } else if (currentView === 'profile') {
+                    finalTarget = 'home';
+                }
+            } else if (target === 'home') {
+                finalTarget = 'home';
+            }
+            
+            if (finalTarget === 'profile') {
+                profileView.classList.remove('hidden');
+                profileIcon.classList.add('hidden');
+                homeIcon.classList.remove('hidden');
+                currentView = 'profile';
+            } else { // finalTarget === 'home'
+                homeView.classList.remove('hidden');
+                searchBar.classList.remove('hidden');
+                homeIcon.classList.add('hidden');
+                profileIcon.classList.remove('hidden');
+                currentView = 'home';
+                if (playerTitle.textContent !== 'Judul Lagu') {
+                    playerBar.classList.remove('hidden');
+                }
+            }
+        }
+        
+        // FUNGSI: Simulasi Simpan Profil
+        function saveProfile() {
+            const username = document.getElementById('profile-username').textContent;
+            const bio = document.getElementById('profile-bio').textContent;
+            
+            showFeedbackMessage('Profil berhasil diperbarui! 🎉');
+        }
+
+
+        // Event Listener untuk tombol Putar/Jeda di Mini Player
+        playPauseBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            updatePlayPauseButton(isPlaying);
+
+            if (isPlaying) {
+                // Simulasi durasi progress bar berjalan lagi
+                progressBar.style.transitionDuration = '10s';
+                progressBar.style.width = '100%';
+            } else {
+                // Hentikan progress bar pada posisi saat ini
+                progressBar.style.transitionDuration = '0s'; 
+                const currentWidth = progressBar.style.width;
+                progressBar.style.width = currentWidth; 
+            }
+        });
+
+        // Inisialisasi: Render daftar lagu saat halaman dimuat
+        window.onload = renderTracks;
+
+    </script>
+</body>
+</html>
